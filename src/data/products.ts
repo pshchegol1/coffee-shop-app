@@ -28,7 +28,7 @@ export const products: Product[] = [
     description: 'A bright and complex coffee from the birthplace of arabica. Grown at elevations above 1,800 meters, this lot delivers an extraordinary cup with floral aromatics and a silky body that lingers on the palate.',
     notes: ['Blueberry', 'Jasmine', 'Lemon Zest', 'Honey'],
     roastLevel: 2,
-    image: '',
+    image: 'https://image.qwenlm.ai/generated-images/1a270eaa-ee69-4526-b09d-d4f1c00daf7e/_result.png',
     emoji: '🫐'
   },
   {
@@ -41,7 +41,7 @@ export const products: Product[] = [
     description: 'Sourced from small farms in the Huila region, this supremo-grade bean offers a perfectly balanced cup. The high altitude and volcanic soil create a coffee with remarkable sweetness and a clean, satisfying finish.',
     notes: ['Caramel', 'Red Apple', 'Milk Chocolate', 'Walnut'],
     roastLevel: 3,
-    image: '',
+    image: 'https://image.qwenlm.ai/generated-images/e3026985-9f2b-4301-9d9c-12beb3cf11cc/_result.png',
     emoji: '🍎'
   },
   {
@@ -54,7 +54,7 @@ export const products: Product[] = [
     description: 'From the sun-drenched hills of Minas Gerais, this natural-process coffee delivers comfort in every sip. Low acidity and a full body make it an ideal everyday brew with a naturally sweet character.',
     notes: ['Hazelnut', 'Dark Chocolate', 'Brown Sugar', 'Toffee'],
     roastLevel: 3,
-    image: '',
+    image: 'https://image.qwenlm.ai/generated-images/e2e66fb0-f63d-4fdd-b96a-8a62bc006b3a/_result.png',
     emoji: '🌰'
   },
   {
@@ -67,7 +67,7 @@ export const products: Product[] = [
     description: 'Grown in the shadow of three volcanoes, this coffee benefits from rich volcanic soil and a unique microclimate. The result is a bold, full-bodied cup with deep chocolate undertones and a smoky sweetness.',
     notes: ['Dark Chocolate', 'Smoky Spice', 'Dried Fig', 'Molasses'],
     roastLevel: 4,
-    image: '',
+    image: 'https://image.qwenlm.ai/generated-images/1ed0cedb-cac5-4672-8e9c-807332a7161b/_result.png',
     emoji: '🍫'
   },
   {
@@ -80,7 +80,7 @@ export const products: Product[] = [
     description: 'The AA grade represents the largest and most flavorful beans from Kenya\'s central highlands. Washed processing highlights the bean\'s vibrant acidity and complex fruit character in every cup.',
     notes: ['Blackcurrant', 'Grapefruit', 'Tomato', 'Brown Sugar'],
     roastLevel: 2,
-    image: '',
+    image: 'https://image.qwenlm.ai/generated-images/1dd8ebe7-f95a-4459-9d32-0e142a61abfa/_result.png',
     emoji: '🍇'
   },
   {
@@ -93,7 +93,7 @@ export const products: Product[] = [
     description: 'Wet-hulled in the traditional Giling Basah method, this Sumatran coffee develops its signature earthy depth and velvety body. A bold choice for those who appreciate complexity and a lingering finish.',
     notes: ['Cedar', 'Dark Cocoa', 'Tobacco', 'Earthy'],
     roastLevel: 5,
-    image: '',
+    image: 'https://image.qwenlm.ai/generated-images/e0375e9a-49d9-46b7-bbf9-9f2008d42c97/_result.png',
     emoji: '🌿'
   }
 ];

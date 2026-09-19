@@ -376,14 +376,18 @@ function ProductCard({ product, onClick, onAddToCart }: {
     <div className="bg-white rounded-2xl overflow-hidden border border-cream-200 card-hover group">
       {/* Product Image Area */}
       <button onClick={onClick} className="block w-full">
-        <div className="aspect-[4/3] bg-gradient-to-br from-cream-100 to-cream-200 flex items-center justify-center relative overflow-hidden">
-          <span className="text-6xl group-hover:scale-110 transition-transform duration-500">{product.emoji}</span>
+        <div className="aspect-[4/3] bg-gradient-to-br from-cream-100 to-cream-200 relative overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
           <div className="absolute top-3 left-3">
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${categoryColors[product.category]}`}>
               {product.category.charAt(0).toUpperCase() + product.category.slice(1)} Roast
             </span>
           </div>
-          <div className="absolute bottom-3 right-3 flex gap-0.5">
+          <div className="absolute bottom-3 right-3 flex gap-0.5 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
@@ -463,8 +467,12 @@ function DetailView({ product, onBack, onAddToCart }: {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Product Image */}
-        <div className="aspect-square bg-gradient-to-br from-cream-100 to-cream-200 rounded-2xl flex items-center justify-center">
-          <span className="text-9xl">{product.emoji}</span>
+        <div className="aspect-square bg-gradient-to-br from-cream-100 to-cream-200 rounded-2xl overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
         </div>
 
         {/* Product Details */}
@@ -600,8 +608,12 @@ function CartView({ cart, cartTotal, onUpdateQuantity, onRemove, onCheckout, onC
         <div className="lg:col-span-2 space-y-4">
           {cart.map(item => (
             <div key={item.product.id} className="bg-white rounded-xl border border-cream-200 p-4 sm:p-6 flex gap-4">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-cream-100 to-cream-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                <span className="text-3xl sm:text-4xl">{item.product.emoji}</span>
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-cream-100 to-cream-200 rounded-lg overflow-hidden flex-shrink-0">
+                <img
+                  src={item.product.image}
+                  alt={item.product.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-espresso-800 truncate">{item.product.name}</h3>
