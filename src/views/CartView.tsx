@@ -1,13 +1,11 @@
+import { Link } from 'react-router-dom';
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import { formatPrice } from '../lib/pricing';
 import { useCart } from '../hooks/useCart';
 import { OrderSummary } from '../components/OrderSummary';
 import { QuantityStepper } from '../components/QuantityStepper';
 
-export function CartView({ onCheckout, onContinueShopping }: {
-  onCheckout: () => void;
-  onContinueShopping: () => void;
-}) {
+export function CartView() {
   const { cart, updateQuantity, removeFromCart } = useCart();
 
   if (cart.length === 0) {
@@ -16,9 +14,9 @@ export function CartView({ onCheckout, onContinueShopping }: {
         <ShoppingBag className="w-20 h-20 text-tint-300 mx-auto mb-6" aria-hidden="true" />
         <h2 className="text-2xl font-bold text-ink mb-3">Your cart is empty</h2>
         <p className="text-ink-subtle mb-8">Discover our curated selection of specialty coffees</p>
-        <button onClick={onContinueShopping} className="btn-primary">
+        <Link to="/" className="btn-primary inline-block">
           Browse Coffees
-        </button>
+        </Link>
       </div>
     );
   }
@@ -40,7 +38,11 @@ export function CartView({ onCheckout, onContinueShopping }: {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-ink truncate">{item.product.name}</h3>
+                <h3 className="font-bold text-ink truncate">
+                  <Link to={`/coffee/${item.product.id}`} className="hover:text-accent transition-colors">
+                    {item.product.name}
+                  </Link>
+                </h3>
                 <p className="text-sm text-ink-subtle">{item.product.origin} · {item.product.weight}</p>
                 <p className="font-semibold text-ink-soft mt-1">{formatPrice(item.product.price)}</p>
 
@@ -72,12 +74,12 @@ export function CartView({ onCheckout, onContinueShopping }: {
         {/* Order Summary */}
         <div className="lg:col-span-1">
           <OrderSummary showFreeShippingHint>
-            <button onClick={onCheckout} className="btn-primary w-full mt-6">
+            <Link to="/checkout" className="btn-primary block w-full mt-6 text-center">
               Proceed to Checkout
-            </button>
-            <button onClick={onContinueShopping} className="btn-secondary w-full mt-3">
+            </Link>
+            <Link to="/" className="btn-secondary block w-full mt-3 text-center">
               Continue Shopping
-            </button>
+            </Link>
           </OrderSummary>
         </div>
       </div>

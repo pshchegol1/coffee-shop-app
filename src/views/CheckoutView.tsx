@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { startTransition, useRef, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { formatPrice, getOrderTotal } from '../lib/pricing';
 import { FormField } from '../components/FormField';
 import { OrderSummary } from '../components/OrderSummary';
 import { useCart } from '../hooks/useCart';
+import type { OrderConfirmationState } from './ConfirmationView';
 
 const EMPTY_CHECKOUT_FORM = {
   email: '',
@@ -19,19 +21,31 @@ const EMPTY_CHECKOUT_FORM = {
 
 type CheckoutField = keyof typeof EMPTY_CHECKOUT_FORM;
 
-export function CheckoutView({ onBack, onOrderPlaced }: {
-  onBack: () => void;
-  onOrderPlaced: () => void;
-}) {
-  const { cartTotal, clearCart } = useCart();
+export function CheckoutView() {
+  const { cart, cartTotal, clearCart } = useCart();
   const [formData, setFormData] = useState(EMPTY_CHECKOUT_FORM);
+  const navigate = useNavigate();
+  // Set on submit so the empty-cart redirect below can't race the navigation to the confirmation page.
+  const orderPlaced = useRef(false);
+
+  // Nothing to check out (e.g. the page was opened directly or refreshed): send them to the cart.
+  if (cart.length === 0 && !orderPlaced.current) {
+    return <Navigate to="/cart" replace />;
+  }
 
   const total = getOrderTotal(cartTotal);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    clearCart();
-    onOrderPlaced();
+    orderPlaced.current = true;
+    const state: OrderConfirmationState = { orderNumber: Math.floor(Math.random() * 90000 + 10000) };
+    // One transition so the route change and the cart clearing land in the same render
+    // (the router runs navigation as a transition). replace: Back from the confirmation
+    // page shouldn't return to a now-empty checkout.
+    startTransition(() => {
+      navigate('/order-confirmed', { replace: true, state });
+      clearCart();
+    });
   };
 
   // Shared props for a required text field bound to formData.
@@ -45,13 +59,13 @@ export function CheckoutView({ onBack, onOrderPlaced }: {
 
   return (
     <div>
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-ink-muted hover:text-ink mb-6 transition-colors"
+      <Link
+        to="/cart"
+        className="flex w-fit items-center gap-2 text-ink-muted hover:text-ink mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         Back to cart
-      </button>
+      </Link>
 
       <h2 className="text-2xl lg:text-3xl font-bold text-ink mb-8">Checkout</h2>
 

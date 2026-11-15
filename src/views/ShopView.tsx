@@ -3,11 +3,10 @@ import { categories } from '../data/products';
 import type { CategoryId, Product } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 
-export function ShopView({ products, activeCategory, setActiveCategory, onProductClick, showMobileFilters, setShowMobileFilters }: {
+export function ShopView({ products, activeCategory, setActiveCategory, showMobileFilters, setShowMobileFilters }: {
   products: Product[];
   activeCategory: CategoryId;
   setActiveCategory: (v: CategoryId) => void;
-  onProductClick: (p: Product) => void;
   showMobileFilters: boolean;
   setShowMobileFilters: (v: boolean) => void;
 }) {
@@ -66,11 +65,7 @@ export function ShopView({ products, activeCategory, setActiveCategory, onProduc
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {products.map(product => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onClick={() => onProductClick(product)}
-            />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (

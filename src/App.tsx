@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Routes, Route, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import { products } from './data/products';
-import type { Product, CategoryId } from './data/products';
+import type { CategoryId } from './data/products';
 import { Header } from './components/Header';
 import { MobileSearchBar } from './components/MobileSearchBar';
 import { Footer } from './components/Footer';
@@ -9,21 +10,22 @@ import { DetailView } from './views/DetailView';
 import { CartView } from './views/CartView';
 import { CheckoutView } from './views/CheckoutView';
 import { ConfirmationView } from './views/ConfirmationView';
-
-type View = 'shop' | 'detail' | 'cart' | 'checkout' | 'confirmation';
+import { NotFoundView } from './views/NotFoundView';
 
 export default function App() {
-  const [view, setView] = useState<View>('shop');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<CategoryId>('all');
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const { pathname } = useLocation();
+  const navigationType = useNavigationType();
+  const navigate = useNavigate();
 
-  // Each view is a new "page": start it at the top instead of the previous scroll position.
+  // New pages start at the top. Back/Forward (POP) is left alone so the browser restores
+  // the previous scroll position, e.g. returning to the same spot in the product grid.
   useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, [view]);
+    if (navigationType !== 'POP') window.scrollTo({ top: 0 });
+  }, [pathname, navigationType]);
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -37,22 +39,15 @@ export default function App() {
     });
   }, [searchQuery, activeCategory]);
 
-  const goToShop = () => {
-    setView('shop');
-    setSelectedProduct(null);
-  };
-
-  // Results only render in the shop view, so searching from any other view takes you there.
+  // Results only render on the shop page, so searching from any other page takes you there.
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    if (view !== 'shop') goToShop();
+    if (pathname !== '/') navigate('/');
   };
 
   return (
     <div className="min-h-screen bg-canvas">
       <Header
-        onCartClick={() => setView('cart')}
-        onLogoClick={goToShop}
         showMobileSearch={showMobileSearch}
         setShowMobileSearch={setShowMobileSearch}
         searchQuery={searchQuery}
@@ -64,38 +59,25 @@ export default function App() {
       )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {view === 'shop' && (
-          <ShopView
-            products={filteredProducts}
-            activeCategory={activeCategory}
-            setActiveCategory={setActiveCategory}
-            onProductClick={(p) => { setSelectedProduct(p); setView('detail'); }}
-            showMobileFilters={showMobileFilters}
-            setShowMobileFilters={setShowMobileFilters}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ShopView
+                products={filteredProducts}
+                activeCategory={activeCategory}
+                setActiveCategory={setActiveCategory}
+                showMobileFilters={showMobileFilters}
+                setShowMobileFilters={setShowMobileFilters}
+              />
+            }
           />
-        )}
-        {view === 'detail' && selectedProduct && (
-          <DetailView
-            key={selectedProduct.id}
-            product={selectedProduct}
-            onBack={goToShop}
-          />
-        )}
-        {view === 'cart' && (
-          <CartView
-            onCheckout={() => setView('checkout')}
-            onContinueShopping={goToShop}
-          />
-        )}
-        {view === 'checkout' && (
-          <CheckoutView
-            onBack={() => setView('cart')}
-            onOrderPlaced={() => setView('confirmation')}
-          />
-        )}
-        {view === 'confirmation' && (
-          <ConfirmationView onBackToShop={goToShop} />
-        )}
+          <Route path="/coffee/:id" element={<DetailView />} />
+          <Route path="/cart" element={<CartView />} />
+          <Route path="/checkout" element={<CheckoutView />} />
+          <Route path="/order-confirmed" element={<ConfirmationView />} />
+          <Route path="*" element={<NotFoundView />} />
+        </Routes>
       </main>
 
       <Footer />

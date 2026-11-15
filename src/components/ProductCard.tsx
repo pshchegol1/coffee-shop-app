@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { MapPin, ShoppingBag } from 'lucide-react';
 import type { Product } from '../data/products';
 import { formatPrice } from '../lib/pricing';
@@ -12,16 +13,14 @@ const ROAST_BADGE_COLORS: Record<Product['category'], string> = {
   dark: 'bg-espresso-200 text-espresso-700',
 };
 
-export function ProductCard({ product, onClick }: {
-  product: Product;
-  onClick: () => void;
-}) {
+export function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
+  const productUrl = `/coffee/${product.id}`;
 
   return (
     <div className="bg-surface rounded-2xl overflow-hidden border border-line card-hover group">
       {/* Product Image Area */}
-      <button onClick={onClick} className="block w-full" aria-label={`View ${product.name}`}>
+      <Link to={productUrl} className="block w-full" aria-label={`View ${product.name}`}>
         <span className="block aspect-[4/3] bg-gradient-to-br from-tint-100 to-tint-200 relative overflow-hidden">
           <img
             src={product.image}
@@ -38,14 +37,12 @@ export function ProductCard({ product, onClick }: {
             <RoastLevel level={product.roastLevel} dotClassName="w-2 h-2" />
           </span>
         </span>
-      </button>
+      </Link>
 
       {/* Product Info */}
       <div className="p-5">
         <h3 className="font-bold text-ink text-lg leading-tight mb-1 group-hover:text-accent transition-colors">
-          <button onClick={onClick} className="text-left">
-            {product.name}
-          </button>
+          <Link to={productUrl}>{product.name}</Link>
         </h3>
         <div className="flex items-center gap-1 text-sm text-ink-subtle mb-3">
           <MapPin className="w-3.5 h-3.5" aria-hidden="true" />

@@ -1,10 +1,9 @@
+import { Link } from 'react-router-dom';
 import { Coffee, Moon, Search, ShoppingBag, Sun } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import { useCart } from '../hooks/useCart';
 
-export function Header({ onCartClick, onLogoClick, showMobileSearch, setShowMobileSearch, searchQuery, onSearchChange }: {
-  onCartClick: () => void;
-  onLogoClick: () => void;
+export function Header({ showMobileSearch, setShowMobileSearch, searchQuery, onSearchChange }: {
   showMobileSearch: boolean;
   setShowMobileSearch: (v: boolean) => void;
   searchQuery: string;
@@ -20,12 +19,12 @@ export function Header({ onCartClick, onLogoClick, showMobileSearch, setShowMobi
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <button onClick={onLogoClick} className="flex items-center gap-2 group" aria-label="Ember & Bloom — home">
+          <Link to="/" className="flex items-center gap-2 group" aria-label="Ember & Bloom — home">
             <Coffee className="w-7 h-7 text-ink-soft group-hover:text-accent transition-colors" aria-hidden="true" />
             <span className="text-xl lg:text-2xl font-bold text-ink tracking-tight">
               Ember <span className="text-accent">&</span> Bloom
             </span>
-          </button>
+          </Link>
 
           {/* Desktop Search */}
           <div className="hidden lg:flex flex-1 max-w-md mx-8">
@@ -64,10 +63,10 @@ export function Header({ onCartClick, onLogoClick, showMobileSearch, setShowMobi
                 <Moon className="w-5 h-5 text-ink-soft" aria-hidden="true" />
               )}
             </button>
-            <button
-              onClick={onCartClick}
+            <Link
+              to="/cart"
               aria-label={cartCount > 0 ? `Cart, ${cartCount} ${cartCount === 1 ? 'item' : 'items'}` : 'Cart'}
-              className="relative p-2 rounded-full hover:bg-tint-100 transition-colors"
+              className="relative block p-2 rounded-full hover:bg-tint-100 transition-colors"
             >
               <ShoppingBag className="w-5 h-5 text-ink-soft" aria-hidden="true" />
               {cartCount > 0 && (
@@ -78,7 +77,7 @@ export function Header({ onCartClick, onLogoClick, showMobileSearch, setShowMobi
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               )}
-            </button>
+            </Link>
           </div>
         </div>
       </div>

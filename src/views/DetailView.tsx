@@ -1,16 +1,34 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, MapPin, ShoppingBag, Star } from 'lucide-react';
+import { products } from '../data/products';
 import type { Product } from '../data/products';
 import { formatPrice } from '../lib/pricing';
 import { formatRoast } from '../lib/roast';
 import { RoastLevel } from '../components/RoastLevel';
 import { QuantityStepper } from '../components/QuantityStepper';
 import { useCart } from '../hooks/useCart';
+import { NotFoundView } from './NotFoundView';
 
-export function DetailView({ product, onBack }: {
-  product: Product;
-  onBack: () => void;
-}) {
+/** Route page for /coffee/:id. */
+export function DetailView() {
+  const { id } = useParams();
+  const product = products.find(p => p.id === id);
+
+  if (!product) {
+    return (
+      <NotFoundView
+        title="Coffee not found"
+        message="This coffee may no longer be available. Browse our current selection instead."
+      />
+    );
+  }
+
+  // Keyed by id so quantity and "Added" state reset when moving to another coffee.
+  return <ProductDetails key={product.id} product={product} />;
+}
+
+function ProductDetails({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
@@ -28,13 +46,13 @@ export function DetailView({ product, onBack }: {
 
   return (
     <div>
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-ink-muted hover:text-ink mb-6 transition-colors"
+      <Link
+        to="/"
+        className="flex w-fit items-center gap-2 text-ink-muted hover:text-ink mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         Back to shop
-      </button>
+      </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Product Image */}

@@ -1,9 +1,19 @@
-import { useState } from 'react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { Check } from 'lucide-react';
 
-export function ConfirmationView({ onBackToShop }: { onBackToShop: () => void }) {
-  // Generated once per order; computing it during render would change it on every re-render.
-  const [orderNumber] = useState(() => Math.floor(Math.random() * 90000 + 10000));
+/** Passed as router state by CheckoutView when navigating here. */
+export interface OrderConfirmationState {
+  orderNumber: number;
+}
+
+export function ConfirmationView() {
+  // Router state lives in browser history, so the number survives a refresh of this page.
+  const state = useLocation().state as OrderConfirmationState | null;
+
+  // Opened directly with no order behind it.
+  if (!state?.orderNumber) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="text-center py-16 max-w-lg mx-auto">
@@ -19,14 +29,14 @@ export function ConfirmationView({ onBackToShop }: { onBackToShop: () => void })
       </p>
       <div className="bg-tint-50 border border-line rounded-xl p-6 mb-8">
         <p className="text-sm text-ink-muted">
-          <span className="font-semibold">Order #EB-{orderNumber}</span>
+          <span className="font-semibold">Order #EB-{state.orderNumber}</span>
           <br />
           Estimated delivery: 3–5 business days
         </p>
       </div>
-      <button onClick={onBackToShop} className="btn-primary">
+      <Link to="/" className="btn-primary inline-block">
         Continue Shopping
-      </button>
+      </Link>
     </div>
   );
 }
