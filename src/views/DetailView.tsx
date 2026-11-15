@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check, MapPin, Minus, Plus, ShoppingBag, Star } from 'lucide-react';
+import { ArrowLeft, Check, MapPin, ShoppingBag, Star } from 'lucide-react';
 import type { Product } from '../data/products';
 import { formatPrice } from '../lib/pricing';
 import { formatRoast } from '../lib/roast';
 import { RoastLevel } from '../components/RoastLevel';
+import { QuantityStepper } from '../components/QuantityStepper';
+import { useCart } from '../hooks/useCart';
 
-export function DetailView({ product, onBack, onAddToCart }: {
+export function DetailView({ product, onBack }: {
   product: Product;
   onBack: () => void;
-  onAddToCart: (qty: number) => void;
 }) {
+  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addedTimer = useRef<number | undefined>(undefined);
@@ -18,7 +20,7 @@ export function DetailView({ product, onBack, onAddToCart }: {
   useEffect(() => () => window.clearTimeout(addedTimer.current), []);
 
   const handleAdd = () => {
-    onAddToCart(quantity);
+    addToCart(product, quantity);
     setAdded(true);
     window.clearTimeout(addedTimer.current);
     addedTimer.current = window.setTimeout(() => setAdded(false), 2000);
@@ -90,26 +92,7 @@ export function DetailView({ product, onBack, onAddToCart }: {
 
             <div className="flex items-center gap-4">
               {/* Quantity Selector */}
-              <div className="flex items-center border border-line rounded-lg">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={quantity <= 1}
-                  aria-label="Decrease quantity"
-                  className="p-3 hover:bg-tint-50 transition-colors rounded-l-lg disabled:opacity-40 disabled:hover:bg-transparent"
-                >
-                  <Minus className="w-4 h-4 text-ink-muted" aria-hidden="true" />
-                </button>
-                <span className="px-4 py-3 font-semibold text-ink min-w-[3rem] text-center" aria-live="polite">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  aria-label="Increase quantity"
-                  className="p-3 hover:bg-tint-50 transition-colors rounded-r-lg"
-                >
-                  <Plus className="w-4 h-4 text-ink-muted" aria-hidden="true" />
-                </button>
-              </div>
+              <QuantityStepper value={quantity} onChange={setQuantity} min={1} />
 
               {/* Add Button */}
               <button

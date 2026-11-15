@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { products } from './data/products';
 import type { Product, CategoryId } from './data/products';
-import { useCart } from './hooks/useCart';
 import { Header } from './components/Header';
 import { MobileSearchBar } from './components/MobileSearchBar';
 import { Footer } from './components/Footer';
@@ -20,7 +19,6 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState<CategoryId>('all');
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const { cart, cartTotal, cartCount, addToCart, removeFromCart, updateQuantity, clearCart } = useCart();
 
   // Each view is a new "page": start it at the top instead of the previous scroll position.
   useEffect(() => {
@@ -50,15 +48,9 @@ export default function App() {
     if (view !== 'shop') goToShop();
   };
 
-  const handleCheckout = () => {
-    clearCart();
-    setView('confirmation');
-  };
-
   return (
     <div className="min-h-screen bg-canvas">
       <Header
-        cartCount={cartCount}
         onCartClick={() => setView('cart')}
         onLogoClick={goToShop}
         showMobileSearch={showMobileSearch}
@@ -78,7 +70,6 @@ export default function App() {
             activeCategory={activeCategory}
             setActiveCategory={setActiveCategory}
             onProductClick={(p) => { setSelectedProduct(p); setView('detail'); }}
-            onAddToCart={addToCart}
             showMobileFilters={showMobileFilters}
             setShowMobileFilters={setShowMobileFilters}
           />
@@ -88,25 +79,18 @@ export default function App() {
             key={selectedProduct.id}
             product={selectedProduct}
             onBack={goToShop}
-            onAddToCart={(qty) => { addToCart(selectedProduct, qty); }}
           />
         )}
         {view === 'cart' && (
           <CartView
-            cart={cart}
-            cartTotal={cartTotal}
-            onUpdateQuantity={updateQuantity}
-            onRemove={removeFromCart}
             onCheckout={() => setView('checkout')}
             onContinueShopping={goToShop}
           />
         )}
         {view === 'checkout' && (
           <CheckoutView
-            cart={cart}
-            cartTotal={cartTotal}
             onBack={() => setView('cart')}
-            onConfirm={handleCheckout}
+            onOrderPlaced={() => setView('confirmation')}
           />
         )}
         {view === 'confirmation' && (

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import type { CartItem } from '../data/products';
-import { formatPrice, getShipping } from '../lib/pricing';
+import { formatPrice, getOrderTotal } from '../lib/pricing';
 import { FormField } from '../components/FormField';
+import { OrderSummary } from '../components/OrderSummary';
+import { useCart } from '../hooks/useCart';
 
 const EMPTY_CHECKOUT_FORM = {
   email: '',
@@ -18,20 +19,19 @@ const EMPTY_CHECKOUT_FORM = {
 
 type CheckoutField = keyof typeof EMPTY_CHECKOUT_FORM;
 
-export function CheckoutView({ cart, cartTotal, onBack, onConfirm }: {
-  cart: CartItem[];
-  cartTotal: number;
+export function CheckoutView({ onBack, onOrderPlaced }: {
   onBack: () => void;
-  onConfirm: () => void;
+  onOrderPlaced: () => void;
 }) {
+  const { cartTotal, clearCart } = useCart();
   const [formData, setFormData] = useState(EMPTY_CHECKOUT_FORM);
 
-  const shipping = getShipping(cartTotal);
-  const total = cartTotal + shipping;
+  const total = getOrderTotal(cartTotal);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    onConfirm();
+    clearCart();
+    onOrderPlaced();
   };
 
   // Shared props for a required text field bound to formData.
@@ -93,41 +93,14 @@ export function CheckoutView({ cart, cartTotal, onBack, onConfirm }: {
 
         {/* Order Summary Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-surface rounded-xl border border-line p-6 sticky top-24">
-            <h3 className="font-bold text-ink text-lg mb-4">Order Summary</h3>
-            <div className="space-y-3 mb-4">
-              {cart.map(item => (
-                <div key={item.product.id} className="flex justify-between text-sm">
-                  <span className="text-ink-muted truncate mr-2">
-                    {item.product.name} × {item.quantity}
-                  </span>
-                  <span className="font-medium text-ink flex-shrink-0">
-                    {formatPrice(item.product.price * item.quantity)}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="border-t border-line pt-3 space-y-2 text-sm">
-              <div className="flex justify-between text-ink-subtle">
-                <span>Subtotal</span>
-                <span>{formatPrice(cartTotal)}</span>
-              </div>
-              <div className="flex justify-between text-ink-subtle">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
-              </div>
-              <div className="border-t border-line pt-2 flex justify-between font-bold text-ink text-base">
-                <span>Total</span>
-                <span>{formatPrice(total)}</span>
-              </div>
-            </div>
+          <OrderSummary showItems>
             <button type="submit" className="btn-primary w-full mt-6">
               Place Order — {formatPrice(total)}
             </button>
             <p className="text-xs text-center text-ink-subtle mt-3">
               🔒 This is a simulated checkout
             </p>
-          </div>
+          </OrderSummary>
         </div>
       </form>
     </div>

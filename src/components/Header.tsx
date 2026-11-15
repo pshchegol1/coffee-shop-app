@@ -1,8 +1,8 @@
 import { Coffee, Moon, Search, ShoppingBag, Sun } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
+import { useCart } from '../hooks/useCart';
 
-export function Header({ cartCount, onCartClick, onLogoClick, showMobileSearch, setShowMobileSearch, searchQuery, onSearchChange }: {
-  cartCount: number;
+export function Header({ onCartClick, onLogoClick, showMobileSearch, setShowMobileSearch, searchQuery, onSearchChange }: {
   onCartClick: () => void;
   onLogoClick: () => void;
   showMobileSearch: boolean;
@@ -11,6 +11,7 @@ export function Header({ cartCount, onCartClick, onLogoClick, showMobileSearch, 
   onSearchChange: (v: string) => void;
 }) {
   const { theme, toggleTheme } = useTheme();
+  const { cartCount } = useCart();
   const isDark = theme === 'dark';
   const themeLabel = isDark ? 'Switch to light mode' : 'Switch to dark mode';
 

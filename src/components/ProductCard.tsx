@@ -2,6 +2,7 @@ import { MapPin, ShoppingBag } from 'lucide-react';
 import type { Product } from '../data/products';
 import { formatPrice } from '../lib/pricing';
 import { formatRoast } from '../lib/roast';
+import { useCart } from '../hooks/useCart';
 import { RoastLevel } from './RoastLevel';
 
 // Badges sit on top of product photos, so they keep fixed colors in both themes.
@@ -11,11 +12,12 @@ const ROAST_BADGE_COLORS: Record<Product['category'], string> = {
   dark: 'bg-espresso-200 text-espresso-700',
 };
 
-export function ProductCard({ product, onClick, onAddToCart }: {
+export function ProductCard({ product, onClick }: {
   product: Product;
   onClick: () => void;
-  onAddToCart: () => void;
 }) {
+  const { addToCart } = useCart();
+
   return (
     <div className="bg-surface rounded-2xl overflow-hidden border border-line card-hover group">
       {/* Product Image Area */}
@@ -64,7 +66,7 @@ export function ProductCard({ product, onClick, onAddToCart }: {
             {formatPrice(product.price)}
           </span>
           <button
-            onClick={onAddToCart}
+            onClick={() => addToCart(product)}
             aria-label={`Add ${product.name} to cart`}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium hover:bg-primary-hover transition-all active:scale-95"
           >

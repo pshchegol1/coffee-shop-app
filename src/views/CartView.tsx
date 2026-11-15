@@ -1,15 +1,15 @@
-import { Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
-import type { CartItem } from '../data/products';
-import { FREE_SHIPPING_THRESHOLD, formatPrice, getShipping } from '../lib/pricing';
+import { ShoppingBag, Trash2 } from 'lucide-react';
+import { formatPrice } from '../lib/pricing';
+import { useCart } from '../hooks/useCart';
+import { OrderSummary } from '../components/OrderSummary';
+import { QuantityStepper } from '../components/QuantityStepper';
 
-export function CartView({ cart, cartTotal, onUpdateQuantity, onRemove, onCheckout, onContinueShopping }: {
-  cart: CartItem[];
-  cartTotal: number;
-  onUpdateQuantity: (id: string, qty: number) => void;
-  onRemove: (id: string) => void;
+export function CartView({ onCheckout, onContinueShopping }: {
   onCheckout: () => void;
   onContinueShopping: () => void;
 }) {
+  const { cart, updateQuantity, removeFromCart } = useCart();
+
   if (cart.length === 0) {
     return (
       <div className="text-center py-16">
@@ -22,8 +22,6 @@ export function CartView({ cart, cartTotal, onUpdateQuantity, onRemove, onChecko
       </div>
     );
   }
-
-  const shipping = getShipping(cartTotal);
 
   return (
     <div>
@@ -47,27 +45,14 @@ export function CartView({ cart, cartTotal, onUpdateQuantity, onRemove, onChecko
                 <p className="font-semibold text-ink-soft mt-1">{formatPrice(item.product.price)}</p>
 
                 <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center border border-line rounded-lg">
-                    <button
-                      onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}
-                      aria-label={`Decrease quantity of ${item.product.name}`}
-                      className="p-2 hover:bg-tint-50 transition-colors"
-                    >
-                      <Minus className="w-3.5 h-3.5 text-ink-muted" aria-hidden="true" />
-                    </button>
-                    <span className="px-3 py-2 text-sm font-semibold text-ink" aria-live="polite">
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}
-                      aria-label={`Increase quantity of ${item.product.name}`}
-                      className="p-2 hover:bg-tint-50 transition-colors"
-                    >
-                      <Plus className="w-3.5 h-3.5 text-ink-muted" aria-hidden="true" />
-                    </button>
-                  </div>
+                  <QuantityStepper
+                    size="sm"
+                    value={item.quantity}
+                    onChange={(qty) => updateQuantity(item.product.id, qty)}
+                    itemName={item.product.name}
+                  />
                   <button
-                    onClick={() => onRemove(item.product.id)}
+                    onClick={() => removeFromCart(item.product.id)}
                     aria-label={`Remove ${item.product.name} from cart`}
                     className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                   >
@@ -86,34 +71,14 @@ export function CartView({ cart, cartTotal, onUpdateQuantity, onRemove, onChecko
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-surface rounded-xl border border-line p-6 sticky top-24">
-            <h3 className="font-bold text-ink text-lg mb-4">Order Summary</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-ink-subtle">
-                <span>Subtotal</span>
-                <span>{formatPrice(cartTotal)}</span>
-              </div>
-              <div className="flex justify-between text-ink-subtle">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
-              </div>
-              {shipping > 0 && (
-                <p className="text-xs text-accent bg-amber-50 dark:bg-amber-500/10 p-2 rounded-lg">
-                  Add {formatPrice(FREE_SHIPPING_THRESHOLD - cartTotal)} more for free shipping!
-                </p>
-              )}
-              <div className="border-t border-line pt-3 flex justify-between font-bold text-ink text-base">
-                <span>Total</span>
-                <span>{formatPrice(cartTotal + shipping)}</span>
-              </div>
-            </div>
+          <OrderSummary showFreeShippingHint>
             <button onClick={onCheckout} className="btn-primary w-full mt-6">
               Proceed to Checkout
             </button>
             <button onClick={onContinueShopping} className="btn-secondary w-full mt-3">
               Continue Shopping
             </button>
-          </div>
+          </OrderSummary>
         </div>
       </div>
     </div>
