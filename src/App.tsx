@@ -2,9 +2,8 @@ import { useState, useMemo } from 'react';
 import { products, categories, Product, CartItem } from './data/products';
 import {
   Search, ShoppingBag, X, Plus, Minus, Trash2,
-  Coffee, ArrowLeft, Check, Star, MapPin, Filter, Download
+  Coffee, ArrowLeft, Check, Star, MapPin, Filter
 } from 'lucide-react';
-import { downloadProject } from './utils/downloadProject';
 
 type View = 'shop' | 'detail' | 'cart' | 'checkout' | 'confirmation';
 
@@ -176,17 +175,10 @@ export default function App() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-espresso-600 mt-8 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="border-t border-espresso-600 mt-8 pt-8 text-center">
             <p className="text-sm text-cream-400">
               © 2026 Ember & Bloom Coffee Co. All rights reserved.
             </p>
-            <button
-              onClick={downloadProject}
-              className="flex items-center gap-2 px-5 py-2.5 bg-amber-accent text-white rounded-lg text-sm font-medium hover:bg-amber-600 transition-all active:scale-95 shadow-lg shadow-amber-accent/20"
-            >
-              <Download className="w-4 h-4" />
-              Download Project
-            </button>
           </div>
         </div>
       </footer>
@@ -281,26 +273,6 @@ function ShopView({ products, searchQuery, setSearchQuery, activeCategory, setAc
           Hand-selected beans from the world's finest growing regions, roasted in small batches
           to bring out their unique character.
         </p>
-      </div>
-
-      {/* Download Banner */}
-      <div className="bg-gradient-to-r from-espresso-700 to-espresso-800 rounded-2xl p-6 mb-10 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
-        <div className="flex items-center gap-4 text-center sm:text-left">
-          <div className="w-12 h-12 bg-amber-accent/20 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Download className="w-6 h-6 text-amber-accent" />
-          </div>
-          <div>
-            <h3 className="text-cream-50 font-bold text-lg">Download This Project</h3>
-            <p className="text-cream-300 text-sm">Get the full source code as a ZIP file — ready to run locally</p>
-          </div>
-        </div>
-        <button
-          onClick={downloadProject}
-          className="flex items-center gap-2 px-6 py-3 bg-amber-accent text-white rounded-lg font-medium hover:bg-amber-600 transition-all active:scale-95 whitespace-nowrap shadow-md"
-        >
-          <Download className="w-4 h-4" />
-          Download ZIP
-        </button>
       </div>
 
       {/* Filters */}
