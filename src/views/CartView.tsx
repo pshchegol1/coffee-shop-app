@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Lock, ShoppingBag, Trash2 } from 'lucide-react';
 import { formatPrice } from '../lib/pricing';
@@ -6,9 +7,18 @@ import { useCart } from '../hooks/useCart';
 import { OrderSummary } from '../components/OrderSummary';
 import { QuantityStepper } from '../components/QuantityStepper';
 import { ProductImage } from '../components/ProductImage';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import type { CartItem } from '../data/products';
 
 export function CartView() {
   const { cart, cartCount, updateQuantity, removeFromCart } = useCart();
+  // The item awaiting confirmation before it's removed, if any.
+  const [pendingRemoval, setPendingRemoval] = useState<CartItem | null>(null);
+
+  const confirmRemoval = () => {
+    if (pendingRemoval) removeFromCart(pendingRemoval.product.id);
+    setPendingRemoval(null);
+  };
 
   if (cart.length === 0) {
     return (
@@ -79,13 +89,14 @@ export function CartView() {
                     <QuantityStepper
                       size="sm"
                       value={item.quantity}
-                      onChange={(qty) => updateQuantity(item.product.id, qty)}
+                      // Decreasing to 0 removes the item, so confirm that too.
+                      onChange={(qty) => (qty <= 0 ? setPendingRemoval(item) : updateQuantity(item.product.id, qty))}
                       itemName={item.product.name}
                     />
                     <span className="hidden sm:inline text-xs text-ink-subtle">{formatPrice(item.product.price)} each</span>
                   </div>
                   <button
-                    onClick={() => removeFromCart(item.product.id)}
+                    onClick={() => setPendingRemoval(item)}
                     aria-label={`Remove ${item.product.name} from cart`}
                     className="flex items-center gap-1.5 px-3 py-2 text-sm text-ink-subtle hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-500/10 rounded-full transition-colors"
                   >
@@ -109,6 +120,24 @@ export function CartView() {
           </Link>
         </OrderSummary>
       </div>
+
+      <ConfirmDialog
+        open={pendingRemoval !== null}
+        title="Remove from cart?"
+        description={
+          pendingRemoval && (
+            <>
+              <span className="font-semibold text-ink">{pendingRemoval.product.name}</span>
+              {pendingRemoval.quantity > 1 && ` (×${pendingRemoval.quantity})`} will be removed from your cart.
+            </>
+          )
+        }
+        confirmLabel="Remove"
+        cancelLabel="Keep it"
+        destructive
+        onConfirm={confirmRemoval}
+        onCancel={() => setPendingRemoval(null)}
+      />
     </div>
   );
 }
