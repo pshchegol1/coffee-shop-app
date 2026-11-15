@@ -5,9 +5,12 @@ import { products } from '../data/products';
 import type { Product } from '../data/products';
 import { formatPrice } from '../lib/pricing';
 import { formatRoast } from '../lib/roast';
+import { productImageUrl } from '../lib/images';
 import { RoastLevel } from '../components/RoastLevel';
+import { ProductImage } from '../components/ProductImage';
 import { QuantityStepper } from '../components/QuantityStepper';
 import { useCart } from '../hooks/useCart';
+import { useToast } from '../hooks/useToast';
 import { NotFoundView } from './NotFoundView';
 
 /** Route page for /coffee/:id. */
@@ -30,6 +33,7 @@ export function DetailView() {
 
 function ProductDetails({ product }: { product: Product }) {
   const { addToCart } = useCart();
+  const { showToast } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const addedTimer = useRef<number | undefined>(undefined);
@@ -39,6 +43,11 @@ function ProductDetails({ product }: { product: Product }) {
 
   const handleAdd = () => {
     addToCart(product, quantity);
+    showToast({
+      message: `${quantity > 1 ? `${quantity} × ` : ''}${product.name} added to cart`,
+      imageSrc: productImageUrl(product.imageId, 200),
+      action: { label: 'View cart', to: '/cart' },
+    });
     setAdded(true);
     window.clearTimeout(addedTimer.current);
     addedTimer.current = window.setTimeout(() => setAdded(false), 2000);
@@ -57,11 +66,8 @@ function ProductDetails({ product }: { product: Product }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Product Image */}
         <div className="aspect-square bg-gradient-to-br from-tint-100 to-tint-200 rounded-2xl overflow-hidden">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+          {/* Square crop of a 4:3 photo renders 4/3 wider than its box (584px column on lg). */}
+          <ProductImage product={product} sizes="(min-width: 1024px) 780px, 133vw" loading="eager" />
         </div>
 
         {/* Product Details */}

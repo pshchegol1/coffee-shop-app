@@ -4,7 +4,10 @@ import type { Product } from '../data/products';
 import { formatPrice } from '../lib/pricing';
 import { formatRoast } from '../lib/roast';
 import { useCart } from '../hooks/useCart';
+import { useToast } from '../hooks/useToast';
+import { productImageUrl } from '../lib/images';
 import { RoastLevel } from './RoastLevel';
+import { ProductImage } from './ProductImage';
 
 // Badges sit on top of product photos, so they keep fixed colors in both themes.
 const ROAST_BADGE_COLORS: Record<Product['category'], string> = {
@@ -15,18 +18,28 @@ const ROAST_BADGE_COLORS: Record<Product['category'], string> = {
 
 export function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
+  const { showToast } = useToast();
   const productUrl = `/coffee/${product.id}`;
+
+  const handleAdd = () => {
+    addToCart(product);
+    showToast({
+      message: `${product.name} added to cart`,
+      imageSrc: productImageUrl(product.imageId, 200),
+      action: { label: 'View cart', to: '/cart' },
+    });
+  };
 
   return (
     <div className="bg-surface rounded-2xl overflow-hidden border border-line card-hover group">
       {/* Product Image Area */}
       <Link to={productUrl} className="block w-full" aria-label={`View ${product.name}`}>
         <span className="block aspect-[4/3] bg-gradient-to-br from-tint-100 to-tint-200 relative overflow-hidden">
-          <img
-            src={product.image}
+          <ProductImage
+            product={product}
             alt=""
-            loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            sizes="(min-width: 1024px) 384px, (min-width: 640px) 50vw, 100vw"
+            className="group-hover:scale-105 transition-transform duration-500"
           />
           <span className="absolute top-3 left-3">
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${ROAST_BADGE_COLORS[product.category]}`}>
@@ -63,7 +76,7 @@ export function ProductCard({ product }: { product: Product }) {
             {formatPrice(product.price)}
           </span>
           <button
-            onClick={() => addToCart(product)}
+            onClick={handleAdd}
             aria-label={`Add ${product.name} to cart`}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium hover:bg-primary-hover transition-all active:scale-95"
           >

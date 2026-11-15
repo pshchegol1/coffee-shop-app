@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { Routes, Route, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import { products } from './data/products';
 import type { CategoryId } from './data/products';
+import { filterProducts, sortProducts } from './lib/catalog';
+import type { SortOption } from './lib/catalog';
 import { Header } from './components/Header';
 import { MobileSearchBar } from './components/MobileSearchBar';
 import { Footer } from './components/Footer';
@@ -15,6 +17,7 @@ import { NotFoundView } from './views/NotFoundView';
 export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<CategoryId>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const { pathname } = useLocation();
@@ -27,17 +30,15 @@ export default function App() {
     if (navigationType !== 'POP') window.scrollTo({ top: 0 });
   }, [pathname, navigationType]);
 
-  const filteredProducts = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    return products.filter(p => {
-      const matchesSearch = !query ||
-        p.name.toLowerCase().includes(query) ||
-        p.origin.toLowerCase().includes(query) ||
-        p.notes.some(n => n.toLowerCase().includes(query));
-      const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [searchQuery, activeCategory]);
+  const visibleProducts = useMemo(
+    () => sortProducts(filterProducts(products, { query: searchQuery, category: activeCategory }), sortBy),
+    [searchQuery, activeCategory, sortBy]
+  );
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setActiveCategory('all');
+  };
 
   // Results only render on the shop page, so searching from any other page takes you there.
   const handleSearchChange = (query: string) => {
@@ -64,9 +65,13 @@ export default function App() {
             path="/"
             element={
               <ShopView
-                products={filteredProducts}
+                products={visibleProducts}
+                searchQuery={searchQuery}
                 activeCategory={activeCategory}
                 setActiveCategory={setActiveCategory}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                onClearFilters={clearFilters}
                 showMobileFilters={showMobileFilters}
                 setShowMobileFilters={setShowMobileFilters}
               />

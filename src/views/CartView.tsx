@@ -4,6 +4,7 @@ import { formatPrice } from '../lib/pricing';
 import { useCart } from '../hooks/useCart';
 import { OrderSummary } from '../components/OrderSummary';
 import { QuantityStepper } from '../components/QuantityStepper';
+import { ProductImage } from '../components/ProductImage';
 
 export function CartView() {
   const { cart, updateQuantity, removeFromCart } = useCart();
@@ -31,11 +32,7 @@ export function CartView() {
           {cart.map(item => (
             <div key={item.product.id} className="bg-surface rounded-xl border border-line p-4 sm:p-6 flex gap-4">
               <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-tint-100 to-tint-200 rounded-lg overflow-hidden flex-shrink-0">
-                <img
-                  src={item.product.image}
-                  alt={item.product.name}
-                  className="w-full h-full object-cover"
-                />
+                <ProductImage product={item.product} sizes="128px" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-ink truncate">
