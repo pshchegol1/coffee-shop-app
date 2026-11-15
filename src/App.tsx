@@ -7,6 +7,7 @@ import type { SortOption } from './lib/catalog';
 import { Header } from './components/Header';
 import { MobileSearchBar } from './components/MobileSearchBar';
 import { Footer } from './components/Footer';
+import { BackToTop } from './components/BackToTop';
 import { ShopView } from './views/ShopView';
 import { DetailView } from './views/DetailView';
 import { CartView } from './views/CartView';
@@ -90,6 +91,7 @@ export default function App() {
       </main>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 }
