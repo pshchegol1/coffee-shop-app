@@ -14,3 +14,10 @@ export interface ToastContextValue {
 }
 
 export const ToastContext = createContext<ToastContextValue | null>(null);
+
+/**
+ * Height in px of the toast currently on screen (0 when none), so other floating
+ * UI in the same corner can move out of its way. Kept separate from ToastContext
+ * so components that only call showToast don't re-render as toasts come and go.
+ */
+export const ToastHeightContext = createContext(0);

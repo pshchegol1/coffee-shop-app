@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ToastContext } from './toastContext';
+import { ToastContext, ToastHeightContext } from './toastContext';
 import type { ToastContextValue, ToastOptions } from './toastContext';
 import { Toast } from '../components/Toast';
 
@@ -40,13 +40,28 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
+  // The region below shrinks to 0 when empty, so its height is the toast's height
+  // (which varies: the message can wrap, especially on narrow screens).
+  const region = useRef<HTMLDivElement>(null);
+  const [toastHeight, setToastHeight] = useState(0);
+  useEffect(() => {
+    const el = region.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => setToastHeight(el.offsetHeight));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const value = useMemo<ToastContextValue>(() => ({ showToast }), [showToast]);
 
   return (
     <ToastContext.Provider value={value}>
-      {children}
+      <ToastHeightContext.Provider value={toastHeight}>
+        {children}
+      </ToastHeightContext.Provider>
       {/* Always mounted: screen readers only announce live-region changes reliably if the region already exists. */}
       <div
+        ref={region}
         role="status"
         aria-live="polite"
         className="pointer-events-none fixed z-60 inset-x-4 bottom-4 sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-96"

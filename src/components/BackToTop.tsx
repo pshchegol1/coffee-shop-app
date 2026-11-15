@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
+import { useToastHeight } from '../hooks/useToast';
 
 /** How far the page must be scrolled before the button appears. */
 const SHOW_AFTER_PX = 600;
+
+/** Space kept between the button and a toast showing in the same corner. */
+const TOAST_GAP_PX = 12;
 
 const SIZE = 48;
 const STROKE = 2;
@@ -16,6 +20,9 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(0);
+  // The toast sits in the same corner (and spans the full width on phones), so slide up above it.
+  const toastHeight = useToastHeight();
+  const lift = toastHeight > 0 ? toastHeight + TOAST_GAP_PX : 0;
 
   useEffect(() => {
     let frame = 0;
@@ -59,7 +66,8 @@ export function BackToTop() {
         transition-all duration-300 active:scale-95 ${
           visible ? 'opacity-100 translate-y-0 visible' : 'opacity-0 translate-y-3 invisible pointer-events-none'
         }`}
-      style={{ width: SIZE, height: SIZE }}
+      // `transform` composes with the `translate` utilities used for the show/hide slide.
+      style={{ width: SIZE, height: SIZE, transform: `translateY(-${lift}px)` }}
     >
       {/* Scroll-progress ring, starting at 12 o'clock. */}
       <svg
