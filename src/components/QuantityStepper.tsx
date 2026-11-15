@@ -1,8 +1,8 @@
 import { Minus, Plus } from 'lucide-react';
 
 const SIZES = {
-  sm: { button: 'p-2', icon: 'w-3.5 h-3.5', value: 'px-3 py-2 text-sm' },
-  md: { button: 'p-3', icon: 'w-4 h-4', value: 'px-4 py-3 min-w-12' },
+  sm: { wrapper: 'h-9', button: 'w-9', icon: 'w-3.5 h-3.5', value: 'min-w-8 text-sm' },
+  md: { wrapper: 'h-[3.25rem]', button: 'w-12', icon: 'w-4 h-4', value: 'min-w-10' },
 };
 
 /**
@@ -20,26 +20,27 @@ export function QuantityStepper({ value, onChange, min, size = 'md', itemName }:
   const s = SIZES[size];
   const atMin = min !== undefined && value <= min;
   const labelSuffix = itemName ? ` of ${itemName}` : '';
+  const buttonClass = `${s.button} h-full flex items-center justify-center rounded-full text-ink-muted hover:bg-tint-100 hover:text-ink transition-colors disabled:opacity-35 disabled:hover:bg-transparent`;
 
   return (
-    <div className="flex items-center border border-line rounded-lg">
+    <div className={`${s.wrapper} inline-flex items-center rounded-full border border-line bg-surface p-0.5`}>
       <button
         onClick={() => onChange(value - 1)}
         disabled={atMin}
         aria-label={`Decrease quantity${labelSuffix}`}
-        className={`${s.button} hover:bg-tint-50 transition-colors rounded-l-lg disabled:opacity-40 disabled:hover:bg-transparent`}
+        className={buttonClass}
       >
-        <Minus className={`${s.icon} text-ink-muted`} aria-hidden="true" />
+        <Minus className={s.icon} aria-hidden="true" />
       </button>
-      <span className={`${s.value} font-semibold text-ink text-center`} aria-live="polite">
+      <span className={`${s.value} font-semibold text-ink text-center tabular-nums`} aria-live="polite">
         {value}
       </span>
       <button
         onClick={() => onChange(value + 1)}
         aria-label={`Increase quantity${labelSuffix}`}
-        className={`${s.button} hover:bg-tint-50 transition-colors rounded-r-lg`}
+        className={buttonClass}
       >
-        <Plus className={`${s.icon} text-ink-muted`} aria-hidden="true" />
+        <Plus className={s.icon} aria-hidden="true" />
       </button>
     </div>
   );

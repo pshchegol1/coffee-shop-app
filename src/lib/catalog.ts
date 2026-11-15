@@ -11,7 +11,9 @@ export const SORT_OPTIONS: { id: SortOption; label: string }[] = [
 ];
 
 const searchableText = (p: Product) =>
-  [p.name, p.origin, `${p.category} roast`, p.description, ...p.notes].join(' ').toLowerCase();
+  [p.name, p.origin, p.region, p.process, `${p.category} roast`, p.description, ...p.notes, ...p.brewWith]
+    .join(' ')
+    .toLowerCase();
 
 /**
  * Every word of the query must appear somewhere in the product's text, so

@@ -1,20 +1,13 @@
 import { Link } from 'react-router-dom';
-import { MapPin, ShoppingBag } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import type { Product } from '../data/products';
 import { formatPrice } from '../lib/pricing';
-import { formatRoast } from '../lib/roast';
+import { formatRoast, ROAST_BADGE_COLORS } from '../lib/roast';
 import { useCart } from '../hooks/useCart';
 import { useToast } from '../hooks/useToast';
 import { productImageUrl } from '../lib/images';
 import { RoastLevel } from './RoastLevel';
 import { ProductImage } from './ProductImage';
-
-// Badges sit on top of product photos, so they keep fixed colors in both themes.
-const ROAST_BADGE_COLORS: Record<Product['category'], string> = {
-  light: 'bg-amber-100 text-amber-800',
-  medium: 'bg-orange-100 text-orange-800',
-  dark: 'bg-espresso-200 text-espresso-700',
-};
 
 export function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
@@ -31,60 +24,65 @@ export function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <div className="bg-surface rounded-2xl overflow-hidden border border-line card-hover group">
-      {/* Product Image Area */}
-      <Link to={productUrl} className="block w-full" aria-label={`View ${product.name}`}>
-        <span className="block aspect-[4/3] bg-gradient-to-br from-tint-100 to-tint-200 relative overflow-hidden">
+    <article className="group relative flex flex-col bg-surface rounded-3xl p-2.5 border border-line card-hover">
+      {/* Image */}
+      <div>
+        <span className="block aspect-[4/3] rounded-[1.25rem] bg-gradient-to-br from-tint-100 to-tint-200 relative overflow-hidden">
           <ProductImage
             product={product}
             alt=""
             sizes="(min-width: 1024px) 384px, (min-width: 640px) 50vw, 100vw"
-            className="group-hover:scale-105 transition-transform duration-500"
+            className="group-hover:scale-[1.06] transition-transform duration-700 ease-out"
           />
-          <span className="absolute top-3 left-3">
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${ROAST_BADGE_COLORS[product.category]}`}>
+          <span className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent" />
+          <span className="absolute top-3 left-3 flex gap-1.5">
+            <span className={`px-2.5 py-1 rounded-full text-[0.6875rem] font-semibold backdrop-blur-sm ${ROAST_BADGE_COLORS[product.category]}`}>
               {formatRoast(product.category)}
             </span>
           </span>
-          <span className="absolute bottom-3 right-3 bg-surface/80 backdrop-blur-sm rounded-full px-2 py-1">
-            <RoastLevel level={product.roastLevel} dotClassName="w-2 h-2" />
-          </span>
-        </span>
-      </Link>
-
-      {/* Product Info */}
-      <div className="p-5">
-        <h3 className="font-bold text-ink text-lg leading-tight mb-1 group-hover:text-accent transition-colors">
-          <Link to={productUrl}>{product.name}</Link>
-        </h3>
-        <div className="flex items-center gap-1 text-sm text-ink-subtle mb-3">
-          <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
-          <span>{product.origin}</span>
-          <span className="mx-1" aria-hidden="true">·</span>
-          <span>{product.weight}</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {product.notes.slice(0, 3).map(note => (
-            <span key={note} className="px-2 py-0.5 bg-tint-50 text-ink-muted text-xs rounded-full border border-line">
-              {note}
+          {product.badge && (
+            <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[0.6875rem] font-semibold bg-espresso-900/85 text-cream-50 backdrop-blur-sm">
+              {product.badge}
             </span>
-          ))}
-        </div>
+          )}
+        </span>
+      </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-ink">
-            {formatPrice(product.price)}
-          </span>
+      {/* Info */}
+      <div className="flex flex-col flex-1 px-2.5 pt-4 pb-2">
+        <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-ink-subtle">
+          {product.origin} · {product.region}
+        </p>
+        <h3 className="mt-1.5 text-xl font-semibold text-ink leading-snug">
+          {/* Stretched link: the whole card is clickable, the add button sits above it. */}
+          <Link to={productUrl} className="after:absolute after:inset-0 after:rounded-3xl focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-focus">
+            {product.name}
+          </Link>
+        </h3>
+        <p className="mt-1.5 text-sm text-ink-muted line-clamp-1">
+          {product.notes.slice(0, 3).join(' · ')}
+        </p>
+
+        <div className="mt-auto pt-5 flex items-end justify-between gap-3">
+          <div>
+            <p className="font-display text-2xl font-semibold text-ink leading-none">
+              {formatPrice(product.price)}
+            </p>
+            <div className="mt-2 flex items-center gap-2 text-[0.6875rem] text-ink-subtle">
+              <RoastLevel level={product.roastLevel} />
+              <span>{product.weight}</span>
+            </div>
+          </div>
           <button
             onClick={handleAdd}
             aria-label={`Add ${product.name} to cart`}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium hover:bg-primary-hover transition-all active:scale-95"
+            className="relative z-10 flex items-center gap-1.5 h-11 pl-3.5 pr-4 rounded-full bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover shadow-sm hover:shadow-md transition-all active:scale-95"
           >
-            <ShoppingBag className="w-4 h-4" aria-hidden="true" />
+            <Plus className="w-4 h-4" aria-hidden="true" />
             Add
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

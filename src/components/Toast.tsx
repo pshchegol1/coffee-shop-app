@@ -5,7 +5,7 @@ import type { ToastOptions } from '../context/toastContext';
 /** Presentational toast card. Timing and placement are handled by ToastProvider. */
 export function Toast({ message, imageSrc, action, onDismiss }: ToastOptions & { onDismiss: () => void }) {
   return (
-    <div className="pointer-events-auto flex items-center gap-3 bg-surface border border-line rounded-xl shadow-xl p-3 motion-safe:animate-toast-in">
+    <div className="pointer-events-auto flex items-center gap-3 bg-surface/95 backdrop-blur-xl border border-line rounded-2xl shadow-2xl shadow-espresso-900/15 p-3 motion-safe:animate-toast-in">
       {imageSrc ? (
         <img src={imageSrc} alt="" className="w-12 h-12 rounded-lg object-cover shrink-0" />
       ) : (

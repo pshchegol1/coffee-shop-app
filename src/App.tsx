@@ -19,16 +19,20 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState<CategoryId>('all');
   const [sortBy, setSortBy] = useState<SortOption>('featured');
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const { pathname } = useLocation();
+  const { pathname, hash, key } = useLocation();
   const navigationType = useNavigationType();
   const navigate = useNavigate();
 
-  // New pages start at the top. Back/Forward (POP) is left alone so the browser restores
-  // the previous scroll position, e.g. returning to the same spot in the product grid.
+  // New pages start at the top, or at the #section in the link (e.g. /#roast-guide).
+  // Back/Forward (POP) is left alone so the browser restores the previous scroll position,
+  // e.g. returning to the same spot in the product grid. `key` re-runs this when the same
+  // hash link is clicked again.
   useEffect(() => {
-    if (navigationType !== 'POP') window.scrollTo({ top: 0 });
-  }, [pathname, navigationType]);
+    if (navigationType === 'POP') return;
+    const target = hash ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
+    if (target) target.scrollIntoView();
+    else window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname, hash, key, navigationType]);
 
   const visibleProducts = useMemo(
     () => sortProducts(filterProducts(products, { query: searchQuery, category: activeCategory }), sortBy),
@@ -41,13 +45,15 @@ export default function App() {
   };
 
   // Results only render on the shop page, so searching from any other page takes you there.
+  // Starting a search collapses the home page to its results, so jump back to the top.
   const handleSearchChange = (query: string) => {
+    if (!searchQuery.trim() && query.trim()) window.scrollTo({ top: 0, behavior: 'instant' });
     setSearchQuery(query);
     if (pathname !== '/') navigate('/');
   };
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-screen flex flex-col bg-canvas">
       <Header
         showMobileSearch={showMobileSearch}
         setShowMobileSearch={setShowMobileSearch}
@@ -59,7 +65,7 @@ export default function App() {
         <MobileSearchBar searchQuery={searchQuery} onSearchChange={handleSearchChange} />
       )}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-6 pb-20 lg:pb-28">
         <Routes>
           <Route
             path="/"
@@ -72,8 +78,6 @@ export default function App() {
                 sortBy={sortBy}
                 setSortBy={setSortBy}
                 onClearFilters={clearFilters}
-                showMobileFilters={showMobileFilters}
-                setShowMobileFilters={setShowMobileFilters}
               />
             }
           />

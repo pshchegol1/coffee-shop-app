@@ -1,7 +1,7 @@
 import { startTransition, useRef, useState } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
+import type { ChangeEvent, FormEvent, ReactNode } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Lock, ShieldCheck } from 'lucide-react';
 import { formatPrice, getOrderTotal } from '../lib/pricing';
 import { FormField } from '../components/FormField';
 import { OrderSummary } from '../components/OrderSummary';
@@ -20,6 +20,28 @@ const EMPTY_CHECKOUT_FORM = {
 };
 
 type CheckoutField = keyof typeof EMPTY_CHECKOUT_FORM;
+
+function CheckoutSection({ step, title, aside, children }: {
+  step: number;
+  title: string;
+  aside?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="bg-surface rounded-3xl border border-line p-6 sm:p-7">
+      <div className="flex items-center justify-between gap-3 mb-5">
+        <h2 className="flex items-center gap-3 text-xl font-medium text-ink">
+          <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary text-on-primary text-xs font-bold font-sans">
+            {step}
+          </span>
+          {title}
+        </h2>
+        {aside}
+      </div>
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
 
 export function CheckoutView() {
   const { cart, cartTotal, clearCart } = useCart();
@@ -61,61 +83,58 @@ export function CheckoutView() {
     <div>
       <Link
         to="/cart"
-        className="flex w-fit items-center gap-2 text-ink-muted hover:text-ink mb-6 transition-colors"
+        className="inline-flex items-center gap-2 text-sm font-medium text-ink-muted hover:text-ink mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         Back to cart
       </Link>
 
-      <h2 className="text-2xl lg:text-3xl font-bold text-ink mb-8">Checkout</h2>
+      <div className="mb-8">
+        <p className="eyebrow">Almost there</p>
+        <h1 className="mt-2 text-3xl lg:text-4xl font-medium text-ink">Checkout</h1>
+      </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Contact */}
-          <div className="bg-surface rounded-xl border border-line p-6">
-            <h3 className="font-bold text-ink mb-4">Contact Information</h3>
-            <div className="space-y-4">
-              <FormField {...field('email')} label="Email" type="email" autoComplete="email" placeholder="your@email.com" />
-              <FormField {...field('name')} label="Full Name" type="text" autoComplete="name" placeholder="John Doe" />
-            </div>
-          </div>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_24rem] gap-8 items-start">
+        <div className="space-y-5">
+          <CheckoutSection step={1} title="Contact">
+            <FormField {...field('email')} label="Email" type="email" autoComplete="email" placeholder="you@example.com" />
+            <FormField {...field('name')} label="Full name" type="text" autoComplete="name" placeholder="Jane Doe" />
+          </CheckoutSection>
 
-          {/* Shipping */}
-          <div className="bg-surface rounded-xl border border-line p-6">
-            <h3 className="font-bold text-ink mb-4">Shipping Address</h3>
-            <div className="space-y-4">
-              <FormField {...field('address')} label="Address" type="text" autoComplete="street-address" placeholder="123 Coffee Lane" />
-              <div className="grid grid-cols-2 gap-4">
-                <FormField {...field('city')} label="City" type="text" autoComplete="address-level2" placeholder="Brooklyn" />
-                <FormField {...field('zip')} label="ZIP Code" type="text" autoComplete="postal-code" placeholder="11201" />
-              </div>
+          <CheckoutSection step={2} title="Shipping address">
+            <FormField {...field('address')} label="Street address" type="text" autoComplete="street-address" placeholder="123 Coffee Lane" />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField {...field('city')} label="City" type="text" autoComplete="address-level2" placeholder="Brooklyn" />
+              <FormField {...field('zip')} label="ZIP code" type="text" autoComplete="postal-code" placeholder="11201" />
             </div>
-          </div>
+          </CheckoutSection>
 
           {/* Payment — simulated, so card autofill is deliberately off to keep real card data out of it. */}
-          <div className="bg-surface rounded-xl border border-line p-6">
-            <h3 className="font-bold text-ink mb-4">Payment (Simulated)</h3>
-            <div className="space-y-4">
-              <FormField {...field('cardNumber')} label="Card Number" type="text" inputMode="numeric" autoComplete="off" maxLength={19} placeholder="4242 4242 4242 4242" />
-              <div className="grid grid-cols-2 gap-4">
-                <FormField {...field('expiry')} label="Expiry" type="text" inputMode="numeric" autoComplete="off" maxLength={5} placeholder="MM/YY" />
-                <FormField {...field('cvv')} label="CVV" type="text" inputMode="numeric" autoComplete="off" maxLength={4} placeholder="123" />
-              </div>
+          <CheckoutSection
+            step={3}
+            title="Payment"
+            aside={
+              <span className="rounded-full bg-tint-100 px-3 py-1 text-xs font-medium text-ink-muted">Simulated</span>
+            }
+          >
+            <FormField {...field('cardNumber')} label="Card number" type="text" inputMode="numeric" autoComplete="off" maxLength={19} placeholder="4242 4242 4242 4242" />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField {...field('expiry')} label="Expiry" type="text" inputMode="numeric" autoComplete="off" maxLength={5} placeholder="MM/YY" />
+              <FormField {...field('cvv')} label="CVV" type="text" inputMode="numeric" autoComplete="off" maxLength={4} placeholder="123" />
             </div>
-          </div>
+          </CheckoutSection>
         </div>
 
-        {/* Order Summary Sidebar */}
-        <div className="lg:col-span-1">
-          <OrderSummary showItems>
-            <button type="submit" className="btn-primary w-full mt-6">
-              Place Order — {formatPrice(total)}
-            </button>
-            <p className="text-xs text-center text-ink-subtle mt-3">
-              🔒 This is a simulated checkout
-            </p>
-          </OrderSummary>
-        </div>
+        <OrderSummary showItems>
+          <button type="submit" className="btn-primary w-full mt-6 py-3.5">
+            <Lock className="w-4 h-4" aria-hidden="true" />
+            Place order · {formatPrice(total)}
+          </button>
+          <p className="flex items-center justify-center gap-1.5 text-xs text-ink-subtle mt-3">
+            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+            This is a simulated checkout — no payment is taken
+          </p>
+        </OrderSummary>
       </form>
     </div>
   );
