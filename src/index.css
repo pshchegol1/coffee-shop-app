@@ -28,23 +28,89 @@
   --color-warm-gray: #8b7d6b;
 }
 
+/* `dark:` variants follow the `.dark` class on <html> (set in index.html / useTheme). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Semantic, theme-aware colors. Use these (bg-surface, text-ink, border-line, …)
+ * for anything that should adapt to dark mode. Values live in the variables below.
+ */
+@theme inline {
+  --color-canvas: var(--canvas);         /* page background */
+  --color-surface: var(--surface);       /* cards, inputs */
+  --color-tint-50: var(--tint-50);       /* warm fills, weakest → strongest */
+  --color-tint-100: var(--tint-100);
+  --color-tint-200: var(--tint-200);
+  --color-tint-300: var(--tint-300);
+  --color-line: var(--line);             /* borders, dividers */
+  --color-ink: var(--ink);               /* headings, primary text */
+  --color-ink-soft: var(--ink-soft);     /* secondary headings, icons */
+  --color-ink-muted: var(--ink-muted);   /* body copy, labels */
+  --color-ink-subtle: var(--ink-subtle); /* meta text, placeholders */
+  --color-primary: var(--primary);       /* primary buttons, active chips */
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary); /* text on primary */
+  --color-accent: var(--accent);         /* brand amber highlight */
+  --color-focus: var(--focus);           /* focus rings */
+}
+
+:root {
+  --canvas: var(--color-warm-white);
+  --surface: #ffffff;
+  --tint-50: var(--color-cream-50);
+  --tint-100: var(--color-cream-100);
+  --tint-200: var(--color-cream-200);
+  --tint-300: var(--color-cream-300);
+  --line: var(--color-cream-200);
+  --ink: var(--color-espresso-800);
+  --ink-soft: var(--color-espresso-700);
+  --ink-muted: var(--color-espresso-600);
+  --ink-subtle: var(--color-warm-gray);
+  --primary: var(--color-espresso-700);
+  --primary-hover: var(--color-espresso-600);
+  --on-primary: var(--color-cream-50);
+  --accent: var(--color-amber-accent);
+  --focus: var(--color-espresso-400);
+  color-scheme: light;
+}
+
+:root.dark {
+  --canvas: #17110c;
+  --surface: #211810;
+  --tint-50: #281d14;
+  --tint-100: #302318;
+  --tint-200: #3c2c1f;
+  --tint-300: #6e5539;
+  --line: #3a2b1e;
+  --ink: #f6ede0;
+  --ink-soft: #ecdcc4;
+  --ink-muted: #cfb99d;
+  --ink-subtle: #a8977f;
+  --primary: var(--color-cream-400);
+  --primary-hover: var(--color-cream-300);
+  --on-primary: var(--color-espresso-900);
+  --accent: #dc9a50;
+  --focus: var(--color-cream-500);
+  color-scheme: dark;
+}
+
 @layer base {
   body {
     font-family: 'Georgia', serif;
-    background-color: var(--color-warm-white);
-    color: var(--color-espresso-800);
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-espresso-700 text-cream-50 px-6 py-3 rounded-lg font-medium
-           hover:bg-espresso-600 transition-all duration-300 active:scale-95;
+    @apply bg-primary text-on-primary px-6 py-3 rounded-lg font-medium
+           hover:bg-primary-hover transition-all duration-300 active:scale-95;
   }
-  
+
   .btn-secondary {
-    @apply border-2 border-espresso-700 text-espresso-700 px-6 py-3 rounded-lg font-medium
-           hover:bg-espresso-700 hover:text-cream-50 transition-all duration-300 active:scale-95;
+    @apply border-2 border-primary text-primary px-6 py-3 rounded-lg font-medium
+           hover:bg-primary hover:text-on-primary transition-all duration-300 active:scale-95;
   }
 
   .card-hover {

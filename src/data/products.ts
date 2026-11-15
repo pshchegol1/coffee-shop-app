@@ -98,7 +98,9 @@ export const products: Product[] = [
   }
 ];
 
-export const categories = [
+export type CategoryId = 'all' | Product['category'];
+
+export const categories: { id: CategoryId; label: string }[] = [
   { id: 'all', label: 'All Coffees' },
   { id: 'light', label: 'Light Roast' },
   { id: 'medium', label: 'Medium Roast' },
